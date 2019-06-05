@@ -59,7 +59,8 @@ def register_shellcontext(app):
         """Shell context objects."""
         return {
             'db': db,
-            'User': models.User}
+            'User': models.User
+        }
 
     app.shell_context_processor(shell_context)
 
@@ -70,3 +71,5 @@ def register_commands(app):
     app.cli.add_command(commands.lint)
     app.cli.add_command(commands.clean)
     app.cli.add_command(commands.urls)
+    app.cli.add_command(commands.deploy)
+    app.cli.add_command(commands.fake_data)

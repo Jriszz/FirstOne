@@ -6,9 +6,9 @@ from flask_login import UserMixin
 from flask import current_app
 class User(Model,UserMixin):
     __tablename__ = 'user'
-    user_id  = Column(db.SmallInteger,nullable=False,primary_key=True,comment='用户Id')
+    user_id  = Column(db.SmallInteger,nullable=False,primary_key=True,comment='用户Id',index=True,autoincrement=True)
+    user_password = Column(db.String(128), nullable=False, comment='用户密码')
     user_name = Column(db.String(255),nullable=False,comment='用户姓名')
-    user_password = Column(db.String(128),nullable=False,comment='用户密码')
     create_time = Column(db.DateTime,nullable=False,default=db.func.now(),comment='创建时间')
     update_time = Column(db.DateTime,nullable=False,default=db.func.now(),comment='更新时间')
     def __repr__(self):
@@ -17,7 +17,7 @@ class User(Model,UserMixin):
     @property
     def user_name(self):
         return self.user_name
-    @proprty
+    @property
     def user_password(self):
         raise AttributeError('password is not a readable attribute')
     @user_password.setter
@@ -34,13 +34,14 @@ class User(Model,UserMixin):
             res = s.loads(token)
         except:
             return False
-        if s.get('token_value') != self.id:
+        if res.get('token_value') != self.id:
             return False
         return True
 class HouseInfo(Model):
     __tablename__ = 'houseinfo'
-    house_id = Column(db.Integer,nullable=False,primary_key=True)
+    house_id = Column(db.Integer,nullable=False,primary_key=True,index=True,autoincrement=True)
     house_address = Column(db.String(255),nullable=False)
+    house_name = Column(db.String(255), nullable=False)
     house_areas = Column(db.String(64),nullable=False)
     house_use_lifetime=Column(db.SmallInteger,nullable=False)
     create_time = Column(db.DateTime, nullable=False, default=db.func.now(), comment='创建时间')

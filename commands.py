@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 """Click commands."""
 import os
+import click
+from random import randint,sample
+import fake
 from glob import glob
 from subprocess import call
 
-import click
 from flask import current_app
 from flask.cli import with_appcontext
 from werkzeug.exceptions import MethodNotAllowed, NotFound
-from .database import db
+from wechat_app.database import db
+from wechat_app.models import User,HouseInfo,RecruitInfo
 from flask_migrate import upgrade
 HERE = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.join(HERE, os.pardir)
@@ -126,6 +129,38 @@ def urls(url, order):
     for row in rows:
         click.echo(str_template.format(*row[:column_length]))
 
-    @click.command()
-    def deploy():
-        upgrade()
+@click.command()
+@with_appcontext
+def deploy():
+    '''
+    drop all the database after rebuild a new database
+    '''
+    db.create_all()
+
+@click.command()
+def fake_data():
+    '''
+    To produce some fake data for test
+    '''
+    count = 10
+    i= 0
+    while i < count:
+        ran_words =['A','B','C','1','2','D','F','s','3','6']
+        res = sample(ran_words,6)
+        pwd = ''.join(res)
+        data = User(user_name=fake.name(),
+                    user_password=pwd)
+        db.session.add(data)
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+        house = HouseInfo(house_address=fake.address(),
+                          house_areas = randint(50,200),
+                          house_use_lifetime=randint(20,70))
+        db.session.add(house)
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+        i += 1
